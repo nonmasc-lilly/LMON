@@ -1,6 +1,9 @@
 org 0x0000
 jmp _WRITER_MON_START
+MON_USER_API_LENGTH: dw MON_USER_API_END-$
 include "basics.asm"
+MON_USER_API_END:
+WRITER_MON_LENGTH: dw WRITER_MON_END-$
         ;                                                                                   !!!
 WRITER_MON_WELCOME_MSG:
         db "Hello World! This is LMON WRITER, a simple writing program!", 0x0A, 0x0D
@@ -141,4 +144,4 @@ _WRITER_MON_SHELL_WRITE_CMD:
         call _MON_USER_API_PRINT_STR
         ret
 
-
+WRITER_MON_END:
