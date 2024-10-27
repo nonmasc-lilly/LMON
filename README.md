@@ -39,3 +39,13 @@ To run on hardware one must acquire a computer which still supports legacy bios 
 a USB the lilmon binary. On linux one can simply use dd like so:
 `dd if=build/lilmon of=/dev/your_drive bs=4M status=progress`. We can then plug into the computer
 and boot from the drive.
+
+A program is added now, to the address 0x0000, beneath that is a length (this length is the length
+of the API which said program uses) and after that is another (the length of the program itself,
+both of these are words). This program is a writer program, calling 0x0000 will allow the user
+to write ASCII text into an address of choice, it has the following commands (as of yet):
+
+- `W <addr: word> <string>` the string will be loaded into addr. The string will be ended upon entering
+ a CTR+C
+- `R <addr: word> <length: byte>` print length bytes from addr as ASCII
+- `Q` exit the program and return to LMON
