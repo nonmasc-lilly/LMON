@@ -208,13 +208,21 @@ _MON_START:
         jne .save
         call .get_word
         call _MON_PRINT_NL
+        mov ax, 0x1000
+        mov ds, ax
         mov word [MON_JUMP_ADDR+2], 0x1000
         mov word [MON_JUMP_ADDR  ], bx
         call far [MON_JUMP_ADDR]
+        xor ax, ax
+        mov ds, ax
         jmp .continue
 .save:
         cmp al, '%'
-        jne .invalid_input
+        push 0x00
+        je .save.cont
+        call .invalid_input
+        jmp .continue
+.save.cont:
         mov si, 0x00
         .save_loop:
         cmp si, 0x03
@@ -247,15 +255,28 @@ _MON_START:
         jne .invalid_input
         ret
 .get_word:
+        mov dx, 0x00
         call .get_byte
         mov bh, al
+        or dx, dx
+        jz .get_word.cont1
+        pop bx
+        jmp .continue
+.get_word.cont1:
         call .get_byte
         mov bl, al
+        or dx, dx
+        jz .get_word.cont2
+        pop bx
+        jmp .continue
+.get_word.cont2:
         ret
 .invalid_input:
         mov byte [MON_ERRNO], 0x00
         mov si, MON_INVALID_INPUT_MSG
         call _MON_PRINT_STR
+        mov dx, 0x01
+        ret
 .continue:
         jmp .cmd_loop
 
@@ -263,15 +284,5 @@ print "size: ", $-$$
 print "remaining: ", 0x1FE-($-$$)
 times 0x1FE-($-$$) db 0x00
 dw 0xAA55
-        mov ax, 0x0E48
-        int 0x10
-        mov ax, 0x0E49
-        int 0x10
-        mov ax, 0x0E21
-        int 0x10
-        mov ax, 0x0E0A
-        int 0x10
-        mov ax, 0x0E0D
-        int 0x10
-        retf
+include "writer.asm"
 times 0x1000-($-$$) db 0x00
