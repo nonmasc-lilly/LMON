@@ -215,7 +215,11 @@ _MON_START:
 .save:
         cmp al, '%'
         jne .invalid_input
-        mov ah, 0x13
+        mov si, 0x00
+        .save_loop:
+        cmp si, 0x03
+        je .esave_loop
+        mov ah, 0x03
         mov al, 0x7F
         mov cx, 0x0002
         mov dh, 0x00
@@ -224,6 +228,17 @@ _MON_START:
         mov es, bx
         xor bx, bx
         int 0x13
+        mov ah, 0x02
+        mov al, 0x7F
+        mov cx, 0x0002
+        mov dh, 0x00
+        mov dl, [MON_CUR_DRIVE]
+        mov bx, 0x1000
+        mov es, bx
+        xor bx, bx
+        int 0x13
+        inc si
+        .esave_loop:
         call _MON_PRINT_NL
         jmp .continue
 .get_byte:
